@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>ส่งข้อมูลเข้า Google Sheet</title>
+</head>
+<body>
+  <h2>เพิ่มข้อมูล</h2>
+  <input id="id" placeholder="ID"><br>
+  <input id="name" placeholder="Name"><br>
+  <input id="age" placeholder="Age"><br>
+  <input id="status" placeholder="Status"><br>
+  <button onclick="addData()">เพิ่มข้อมูล</button>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw9CLIlWpOsZO5YEAGDqJxAZRX7BH9-ZFMI3zv0phtcZWXq4V5eIkxzS90agqh3qIHxSw/exec"; // ใส่ลิงก์ของคุณ
+
+    async function addData() {
+      const data = {
+        action: "add",
+        ID: document.getElementById("id").value,
+        Name: document.getElementById("name").value,
+        Age: document.getElementById("age").value,
+        Status: document.getElementById("status").value
+      };
+
+      const res = await fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+      const text = await res.text();
+      alert(text);
+    }
+  </script>
+</body>
+</html>
