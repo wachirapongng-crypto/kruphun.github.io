@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>ระบบจัดการข้อมูลครุภัณฑ์</title>
+  <style>
+    body {
+      font-family: "Prompt", sans-serif;
+      margin: 40px;
+      background: #f8fbff;
+    }
+    h2 {
+      color: #004aad;
+      margin-bottom: 10px;
+    }
+    input {
+      padding: 6px;
+      margin: 4px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin: 3px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #fff;
+    }
+    button.add { background-color: #007bff; }
+    button.update { background-color: #ffc107; color: #000; }
+    button.delete { background-color: #dc3545; }
+    button.refresh { background-color: #28a745; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #e9f2ff;
+      color: #004aad;
+    }
+    tr:hover { background-color: #f1f1f1; cursor: pointer; }
+    #statusMsg {
+      margin-top: 10px;
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h2>ระบบจัดการข้อมูล (CRUD) ผ่าน Google Sheet</h2>
+
+  <div>
+    <input type="text" id="id" placeholder="รหัส">
+    <input type="text" id="name" placeholder="ชื่อ">
+    <input type="text" id="address" placeholder="ที่อยู่">
+    <input type="text" id="status" placeholder="สถานะ">
+    <input type="date" id="date">
+    <input type="time" id="time">
+    <br>
+    <button class="add" onclick="addData()">เพิ่ม</button>
+    <button class="update" onclick="updateData()">อัปเดต</button>
+    <button class="delete" onclick="deleteData()">ลบ</button>
+    <button class="refresh" onclick="manualRefresh()">รีเฟรชข้อมูล</button>
+  </div>
+
+  <p id="statusMsg">กำลังโหลดข้อมูล...</p>
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>รหัส</th>
+        <th>ชื่อ</th>
+        <th>ที่อยู่</th>
+        <th>สถานะ</th>
+        <th>วันที่</th>
+        <th>เวลา</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="script.js"></script>
+</body>
+</html>
