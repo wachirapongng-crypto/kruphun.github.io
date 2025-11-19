@@ -1,0 +1,93 @@
+<script>
+let editingIndex = null;
+
+document.addEventListener("DOMContentLoaded", loadData);
+
+function loadData() {
+  google.script.run.withSuccessHandler(renderTable).getData();
+}
+
+function renderTable(data) {
+  const tb = document.querySelector("#dataTable tbody");
+  tb.innerHTML = "";
+
+  data.forEach((item, index) => {
+    tb.innerHTML += `
+      <tr>
+        <td>${item.id}</td>
+        <td>${item.name}</td>
+        <td>${item.address}</td>
+        <td>${item.status}</td>
+        <td>${item.date}</td>
+        <td>${item.time}</td>
+        <td>
+          <button onclick="editRow(${index}, '${item.id}', '${item.name}', '${item.address}', '${item.status}', '${item.date}', '${item.time}')">แก้ไข</button>
+          <button onclick="deleteRow(${index})">ลบ</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function openAddForm() {
+  editingIndex = null;
+  document.getElementById("formTitle").innerText = "เพิ่มข้อมูล";
+
+  clearForm();
+  document.getElementById("formBox").classList.remove("hidden");
+}
+
+function clearForm() {
+  document.getElementById("id").value = "";
+  document.getElementById("name").value = "";
+  document.getElementById("address").value = "501";
+  document.getElementById("status").value = "ใช้งานได้";
+  document.getElementById("date").value = "";
+  document.getElementById("time").value = "";
+}
+
+function closeForm() {
+  document.getElementById("formBox").classList.add("hidden");
+}
+
+function saveData() {
+  const item = {
+    id: document.getElementById("id").value,
+    name: document.getElementById("name").value,
+    address: document.getElementById("address").value,
+    status: document.getElementById("status").value,
+    date: document.getElementById("date").value,
+    time: document.getElementById("time").value
+  };
+
+  if (editingIndex === null) {
+    google.script.run.withSuccessHandler(loadData).addData(item);
+  } else {
+    google.script.run.withSuccessHandler(loadData).updateData(editingIndex, item);
+  }
+
+  closeForm();
+}
+
+// Edit
+function editRow(index, id, name, address, status, date, time) {
+  editingIndex = index;
+  document.getElementById("formTitle").innerText = "แก้ไขข้อมูล";
+
+  document.getElementById("id").value = id;
+  document.getElementById("name").value = name;
+  document.getElementById("address").value = address;
+  document.getElementById("status").value = status;
+  document.getElementById("date").value = date;
+  document.getElementById("time").value = time;
+
+  document.getElementById("formBox").classList.remove("hidden");
+}
+
+// Delete
+function deleteRow(index) {
+  if (confirm("ต้องการลบข้อมูลนี้ใช่ไหม?")) {
+    google.script.run.withSuccessHandler(loadData).deleteData(index);
+  }
+}
+</script>
