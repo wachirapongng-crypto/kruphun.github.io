@@ -1,153 +1,77 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>CRUD – WAIT Sheet</title>
-  <style>
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #f5f5f5; }
-    button { margin-right: 5px; }
-    .form-box { margin-top: 20px; padding: 15px; border: 1px solid #ccc; }
-  </style>
+  <base target="_top">
+  <?!= include('css'); ?>
 </head>
 <body>
 
-  <h2>ระบบ CRUD – Google Sheet (WAIT)</h2>
+<h2>ตารางข้อมูล WAIT</h2>
 
-  <div class="form-box">
-    <h3>เพิ่ม / แก้ไข</h3>
+<button onclick="openAddForm()">เพิ่มข้อมูล</button>
 
-    <input id="code" placeholder="รหัส"> <br><br>
-    <input id="name" placeholder="ชื่อ"> <br><br>
+<table id="dataTable" border="1">
+  <thead>
+    <tr>
+      <th>รหัส</th>
+      <th>ชื่อ</th>
+      <th>ที่อยู่</th>
+      <th>สถานะ</th>
+      <th>วันที่</th>
+      <th>เวลา</th>
+      <th>จัดการ</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-    <label>ที่อยู่:</label>
-    <select id="address">
-      <option value="501">501</option>
-      <option value="502">502</option>
-      <option value="503">503</option>
-      <option value="401">401</option>
-      <option value="401A">401A</option>
-      <option value="401B">401B</option>
-      <option value="401C">401C</option>
-      <option value="402">402</option>
-      <option value="403">403</option>
-      <option value="404">404</option>
-      <option value="405">405</option>
-      <option value="ห้องพักครู">ห้องพักครู</option>
-      <option value="301">301</option>
-      <option value="302">302</option>
-    </select>
+<!-- Form -->
+<div id="formBox" class="hidden">
+  <h3 id="formTitle">เพิ่มข้อมูล</h3>
 
-    <br><br>
+  <label>รหัส</label>
+  <input id="id">
 
-    <label>สถานะ:</label>
-    <select id="status">
-      <option value="ใช้งานได้">ใช้งานได้</option>
-      <option value="ชำรุด">ชำรุด</option>
-      <option value="เสื่อมสภาพ">เสื่อมสภาพ</option>
-      <option value="หมดอายุการใช้งาน">หมดอายุการใช้งาน</option>
-      <option value="ไม่รองรับการใช้งาน">ไม่รองรับการใช้งาน</option>
-    </select>
+  <label>ชื่อ</label>
+  <input id="name">
 
-    <br><br>
-    <button onclick="saveData()">บันทึก</button>
-    <input type="hidden" id="editIndex">
-  </div>
+  <label>ที่อยู่</label>
+  <select id="address">
+    <option>501</option>
+    <option>502</option>
+    <option>503</option>
+    <option>401</option>
+    <option>401A</option>
+    <option>401B</option>
+    <option>401C</option>
+    <option>402</option>
+    <option>403</option>
+    <option>404</option>
+    <option>405</option>
+    <option>ห้องพักครู</option>
+    <option>301</option>
+    <option>302</option>
+  </select>
 
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>รหัส</th>
-        <th>ชื่อ</th>
-        <th>ที่อยู่</th>
-        <th>สถานะ</th>
-        <th>วันที่</th>
-        <th>เวลา</th>
-        <th>จัดการ</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <label>สถานะ</label>
+  <select id="status">
+    <option>ใช้งานได้</option>
+    <option>ชำรุด</option>
+    <option>เสื่อมสภาพ</option>
+    <option>หมดอายุการใช้งาน</option>
+    <option>ไม่รองรับการใช้งาน</option>
+  </select>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", loadTable);
+  <label>วันที่</label>
+  <input id="date" type="date">
 
-    function loadTable() {
-      google.script.run.withSuccessHandler(renderTable).getData();
-    }
+  <label>เวลา</label>
+  <input id="time" type="time">
 
-    function renderTable(data) {
-      const tbody = document.querySelector("#dataTable tbody");
-      tbody.innerHTML = "";
+  <button onclick="saveData()">บันทึก</button>
+  <button onclick="closeForm()">ยกเลิก</button>
+</div>
 
-      data.forEach((row, i) => {
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-          <td>${row[0]}</td>
-          <td>${row[1]}</td>
-          <td>${row[2]}</td>
-          <td>${row[3]}</td>
-          <td>${row[4]}</td>
-          <td>${row[5]}</td>
-          <td>
-            <button onclick="editRow(${i})">แก้ไข</button>
-            <button onclick="deleteRow(${i})">ลบ</button>
-          </td>
-        `;
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    function saveData() {
-      const code = document.getElementById("code").value;
-      const name = document.getElementById("name").value;
-      const address = document.getElementById("address").value;
-      const status = document.getElementById("status").value;
-
-      const today = new Date();
-      const date = today.toLocaleDateString("th-TH");
-      const time = today.toLocaleTimeString("th-TH");
-
-      const row = [code, name, address, status, date, time];
-      const index = document.getElementById("editIndex").value;
-
-      if (index === "") {
-        google.script.run.withSuccessHandler(loadTable).addData(row);
-      } else {
-        google.script.run.withSuccessHandler(loadTable).updateData(Number(index), row);
-        document.getElementById("editIndex").value = "";
-      }
-
-      clearForm();
-    }
-
-    function clearForm() {
-      document.getElementById("code").value = "";
-      document.getElementById("name").value = "";
-      document.getElementById("address").value = "501";
-      document.getElementById("status").value = "ใช้งานได้";
-    }
-
-    function editRow(i) {
-      google.script.run.withSuccessHandler(data => {
-        const row = data[i];
-        document.getElementById("code").value = row[0];
-        document.getElementById("name").value = row[1];
-        document.getElementById("address").value = row[2];
-        document.getElementById("status").value = row[3];
-        document.getElementById("editIndex").value = i;
-      }).getData();
-    }
-
-    function deleteRow(i) {
-      if (confirm("แน่ใจว่าจะลบ?")) {
-        google.script.run.withSuccessHandler(loadTable).deleteData(i);
-      }
-    }
-  </script>
-
+<?!= include('js'); ?>
 </body>
 </html>
