@@ -3,118 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <title>ดึงข้อมูล Google Sheet</title>
-<style>
-  body { font-family: "Prompt", sans-serif; padding: 20px; }
-  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-  th { background: #4CAF50; color: white; }
-  select, button { padding: 8px; margin: 5px; }
-</style>
 </head>
 <body>
-
-<h2>ข้อมูลรอการตรวจสอบ (WAIT)</h2>
-
-<table id="waitTable">
-  <thead>
-    <tr>
-      <th>รหัส</th>
-      <th>ชื่อ</th>
-      <th>ที่อยู่</th>
-      <th>สถานะ</th>
-      <th>วันที่</th>
-      <th>เวลา</th>
-      <th>เลือก</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-
-<h3>อัปเดตข้อมูล</h3>
-
-<label>เลือกที่อยู่:</label>
-<select id="location">
-  <option>501</option><option>502</option><option>503</option>
-  <option>401</option><option>401A</option><option>401B</option><option>401C</option>
-  <option>402</option><option>403</option><option>404</option><option>405</option>
-  <option>ห้องพักครู</option><option>301</option><option>302</option>
-</select>
-
-<label>เลือกสถานะ:</label>
-<select id="status">
-  <option>ใช้งานได้</option>
-  <option>ชำรุด</option>
-  <option>เสื่อมสภาพ</option>
-  <option>หมดอายุการใช้งาน</option>
-  <option>ไม่รองรับการใช้งาน</option>
-</select>
-
-<br><br>
-
-<button onclick="updateData()">อัปเดตข้อมูล</button>
-
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbylZdO-NXF68j_fo4k55gdOaMfUcl8GelxuQ9NNF5YkTi8LTuMSA09Llx0QSMcC8g18/exec"; // เปลี่ยนตรงนี้
-
-let selectedRow = null;
-
-// โหลดข้อมูล WAIT
-async function loadData() {
-  const res = await fetch(`${API_URL}?action=getWait`);
-  const data = await res.json();
-
-  const tbody = document.querySelector("#waitTable tbody");
-  tbody.innerHTML = "";
-
-  data.forEach((row) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${row[0]}</td>
-      <td>${row[1]}</td>
-      <td>${row[2]}</td>
-      <td>${row[3]}</td>
-      <td>${row[4]}</td>
-      <td>${row[5]}</td>
-      <td><button onclick="selectRow(this)">เลือก</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-// เลือกแถว
-function selectRow(btn) {
-  const tr = btn.parentNode.parentNode;
-  selectedRow = {
-    code: tr.children[0].innerText,
-    name: tr.children[1].innerText,
-    date: tr.children[4].innerText,
-    time: tr.children[5].innerText
-  };
-
-  alert("เลือกข้อมูลเรียบร้อย");
-}
-
-// อัปเดตไป LOG + ลบจาก WAIT
-async function updateData() {
-  if (!selectedRow) {
-    alert("กรุณาเลือกข้อมูลก่อน");
-    return;
-  }
-
-  const location = document.getElementById("location").value;
-  const status = document.getElementById("status").value;
-
-  const url = `${API_URL}?action=updateLog&code=${selectedRow.code}&name=${selectedRow.name}&location=${location}&status=${status}&date=${selectedRow.date}&time=${selectedRow.time}`;
-
-  await fetch(url);
-
-  alert("อัปเดตสำเร็จแล้ว!");
-
-  loadData();
-}
-
-loadData();
-</script>
+<iframe 
+  src="https://script.google.com/macros/s/AKfycbyyozxrGQzbdTqqTQgIh4p6pwD54-rUn14RyZ_fvzhWQBh3j_uYli96JaQnjrVDm_Rr/exec"
+  style="width:100%; height:100vh; border:none;">
+</iframe>
 
 </body>
 </html>
