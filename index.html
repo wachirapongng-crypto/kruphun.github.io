@@ -1,23 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>จัดการข้อมูล WAIT</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Expenses Demo</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#f4f6f9}
+    table{border-collapse:collapse;width:100%;background:white}
+    th,td{border:1px solid #ddd;padding:8px}
+    th{background:#007bff;color:white}
+    .form-row{margin-bottom:8px}
+  </style>
 </head>
 <body>
-  <h1>จัดการข้อมูล WAIT</h1>
+  <h1>Expenses (Demo)</h1>
 
-  <input id="id" placeholder="รหัส"><br>
-  <input id="name" placeholder="ชื่อ"><br>
-  <input id="address" placeholder="ที่อยู่"><br>
-  <input id="status" placeholder="สถานะ"><br>
+  <div id="list"></div>
 
-  <button onclick="createData()">บันทึกใหม่</button>
-  <button onclick="updateData()">อัปเดตข้อมูล</button>
+  <h3>Add expense</h3>
+  <div>
+    <div class="form-row"><input id="date" placeholder="YYYY-MM-DD" /></div>
+    <div class="form-row"><input id="category" placeholder="Category" /></div>
+    <div class="form-row"><input id="desc" placeholder="Description" /></div>
+    <div class="form-row"><input id="amount" placeholder="Amount" type="number" /></div>
+    <button id="addBtn">Add</button>
+  </div>
 
-  <h2>รายการ WAIT</h2>
-  <table border="1" id="customerTable"></table>
+  <script>
+    // เปลี่ยนเป็น URL ของคุณที่ได้จาก Apps Script deploy
+    const API_ROOT = 'https://script.google.com/macros/s/AKfycbxCN3ubWWDoGj545t2FV16n-eu8D6AYeyQo0itgB0yCOYn17yvzOVCcxuL8Vpzbiiwy/exec';
 
-  <script src="script.js"></script>
+    // JSONP helper
+    function jsonp(url) {
+      return new Promise((resolve, reject) => {
+        const cbName = 'cb_' + Math.random().toString(36).substr(2,9);
+        window[cbName] = function(data) {
+          resolve(data);
+          delete window[cbName];
+          script.remove();
+        };
+        const script = document.createElement('script');
+        script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + 'callback=' + cbName;
+        script.onerror = function(e){
+          reject(new Error('JSONP load error'));
+          delete window[cbName];
+          script.remove();
+        };
+        document.body.appendChild(script);
+      });
+    }
+
+    // build query string
+    function qs(obj) {
+      return Object.keys(obj).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(obj[k])).join('&');
+    }
+
+    async function listAll() {
+      const url = API_ROOT + '?action=list';
+      const res = await jsonp(url);
+      if(res.ok) renderTable(res.data);
+      else document.getElementById('list').innerText = 'Error: ' + (res.msg||'');
+    }
+
+    function renderTable(rows) {
+      if(!rows || rows.length === 0) {
+        document.getElementById('list').innerHTML = '<p>No data</p>';
+        return;
+      }
+      let html = '<table><thead><tr>';
+      Object.keys(rows[0]).forEach(h => html += '<th>' + h + '</th>');
+      html += '<th>Actions</th></tr></thead><tbody>';
+      rows.forEach(r => {
+        html += '<tr>';
+        Object.values(r).forEach(v => html += '<td>' + (v||'') + '</td>');
+        html += `<td>
+          <button onclick="doDelete('${r.id}')">Delete</button>
+          <button onclick="doPrefillUpdate('${r.id}','${r.date}','${r.category}','${(r.description||'').replace(/'/g,"\\'")}','${r.amount}')">Edit</button>
+        </td>`;
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      document.getElementById('list').innerHTML = html;
+    }
+
+    // Add
+    document.getElementById('addBtn').addEventListener('click', async () => {
+      const payload = {
+        action: 'add',
+        date: document.getElementById('date').value || '',
+        category: document.getElementById('category').value || '',
+        description: document.getElementById('desc').value || '',
+        amount: document.getElementById('amount').value || ''
+      };
+      const url = API_ROOT + '?' + qs(payload);
+      const res = await jsonp(url);
+      alert(JSON.stringify(res));
+      listAll();
+    });
+
+    // Delete
+    async function doDelete(id) {
+      if(!confirm('Delete id ' + id + '?')) return;
+      const url = API_ROOT + '?action=delete&id=' + encodeURIComponent(id);
+      const res = await jsonp(url);
+      alert(JSON.stringify(res));
+      listAll();
+    }
+
+    // Update (prefill simple prompt-based)
+    function doPrefillUpdate(id,date,category,desc,amount) {
+      const newDate = prompt('Date (YYYY-MM-DD):', date) || date;
+      const newCat = prompt('Category:', category) || category;
+      const newDesc = prompt('Description:', desc) || desc;
+      const newAmt = prompt('Amount:', amount) || amount;
+      const payload = {
+        action: 'update',
+        id: id,
+        date: newDate,
+        category: newCat,
+        description: newDesc,
+        amount: newAmt
+      };
+      const url = API_ROOT + '?' + qs(payload);
+      jsonp(url).then(res => {
+        alert(JSON.stringify(res));
+        listAll();
+      }).catch(err => alert(err));
+    }
+
+    // initial load
+    listAll();
+  </script>
+
 </body>
 </html>
