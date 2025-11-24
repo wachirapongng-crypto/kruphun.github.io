@@ -5,14 +5,15 @@
   <title>WAIT CRUD</title>
 </head>
 <body>
-  <h1>เพิ่มข้อมูล WAIT</h1>
+  <h1>จัดการข้อมูล WAIT</h1>
 
   <input id="id" placeholder="รหัส"><br>
   <input id="name" placeholder="ชื่อ"><br>
   <input id="address" placeholder="ที่อยู่"><br>
   <input id="status" placeholder="สถานะ"><br>
 
-  <button onclick="createData()">บันทึก</button>
+  <button onclick="createData()">บันทึกใหม่</button>
+  <button onclick="updateData()">อัปเดตข้อมูล</button>
 
   <h2>รายการ WAIT</h2>
   <table border="1" id="customerTable"></table>
