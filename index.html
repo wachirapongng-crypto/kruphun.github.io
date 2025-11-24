@@ -1,94 +1,22 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>ระบบตรวจสอบครุภัณฑ์</title>
-<style>
-table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-th { background: #4CAF50; color: white; }
-select, button { padding: 5px; margin: 2px; }
-</style>
+  <meta charset="UTF-8">
+  <title>WAIT CRUD</title>
 </head>
 <body>
+  <h1>เพิ่มข้อมูล WAIT</h1>
 
-<h2>ข้อมูล WAIT</h2>
-<table id="waitTable">
-  <thead>
-    <tr>
-      <th>รหัส</th><th>ชื่อ</th><th>ที่อยู่</th><th>สถานะ</th><th>วันที่</th><th>เวลา</th><th>อัปเดต</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+  <input id="id" placeholder="รหัส"><br>
+  <input id="name" placeholder="ชื่อ"><br>
+  <input id="address" placeholder="ที่อยู่"><br>
+  <input id="status" placeholder="สถานะ"><br>
 
-<label>เลือกที่อยู่:</label>
-<select id="location">
-  <option>501</option><option>502</option><option>503</option>
-  <option>401</option><option>401A</option><option>401B</option><option>401C</option>
-  <option>402</option><option>403</option><option>404</option><option>405</option>
-  <option>ห้องพักครู</option><option>301</option><option>302</option>
-</select>
+  <button onclick="createData()">บันทึก</button>
 
-<label>เลือกสถานะ:</label>
-<select id="status">
-  <option>ใช้งานได้</option>
-  <option>ชำรุด</option>
-  <option>เสื่อมสภาพ</option>
-  <option>หมดอายุการใช้งาน</option>
-  <option>ไม่รองรับการใช้งาน</option>
-</select>
+  <h2>รายการ WAIT</h2>
+  <table border="1" id="customerTable"></table>
 
-<button onclick="updateSelected()">อัปเดตข้อมูล</button>
-
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycby1gP7GTZ4CDK4DSuBjwVP-JIvMRpEXWDcpZdIzU4aebw9HjTETnr54Qt7cGkXplLa8/exec"; // ใส่ URL จาก Deploy
-
-let selectedCode = null;
-
-async function loadData(){
-  const res = await fetch(API_URL+"?action=getWait");
-  const data = await res.json();
-  const tbody = document.querySelector("#waitTable tbody");
-  tbody.innerHTML = "";
-
-  data.forEach(r=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${r.code}</td><td>${r.name}</td><td>${r.address}</td>
-      <td>${r.status}</td><td>${r.date}</td><td>${r.time}</td>
-      <td><button onclick="selectRow('${r.code}')">เลือก</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function selectRow(code){ 
-  selectedCode = code; 
-  alert("เลือก รหัส: "+code); 
-}
-
-async function updateSelected(){
-  if(!selectedCode){ alert("กรุณาเลือกข้อมูลก่อน"); return; }
-  const location = document.getElementById("location").value;
-  const status = document.getElementById("status").value;
-
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({action:"updateLog", code:selectedCode, location, status})
-  });
-  const result = await res.json();
-  if(result.status=="success"){
-    alert("อัปเดตเรียบร้อย");
-    selectedCode = null;
-    loadData();
-  }else{
-    alert("เกิดข้อผิดพลาด");
-  }
-}
-
-window.onload = loadData;
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
